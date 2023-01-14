@@ -68,7 +68,7 @@ Vec2 getMousePosition(Display *display){
     }
 
     if(result != True){
-        fprintf(stderr, "Mouse wan't found.\n");
+        fprintf(stderr, "Mouse wasn't found.\n");
         return mousePos;
     }
 

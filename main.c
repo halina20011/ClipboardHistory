@@ -72,9 +72,6 @@ void WatchSelection(Display *display, Window window, const char *bufname){
 }
 
 int main(){
-    // FILE *fp;
-    // char *fileName = "/tmp/test";
-
     printf("Starting\n");
     fflush(stdout);
 

@@ -142,12 +142,14 @@ unsigned int *readFile(char *fileName, unsigned int *dataLengthCount){
     // printf("Colons:     %i\n", colonC);
 
     unsigned int size = 0;
-
-    if(newLineC != colonC){
-        printf("Wrong format in file\n");
-        (newLineC < colonC) ? newLineC : colonC; 
+    if(newLineC == colonC){
+        size = newLineC;
     }
-        
+    else{
+        printf("Wrong format in file\n");
+        exit(1);
+    }
+    
     dataLength = malloc(sizeof(unsigned int) * size);
     unsigned int *pos = dataLength;
 
