@@ -17,6 +17,9 @@ touch /tmp/clipboardText
 touch /tmp/tmpClipboardText
 ```
 
+## Preview
+![Preview](/Images/preview.png)
+
 ## How it works
 This are two programs that are responsible for this to work:
 main.c:         program that listens when if copied text hrow x11lib
@@ -40,11 +43,11 @@ add text wrap </br>
 add image support </br>
 
 ## Acknowledgment
-This programm usses for base64 encoding `base.c` and `os.o` that are under BSD license
-http://web.mit.edu/freebsd/head/contrib/wpa/src/utils/base64.c
-http://web.mit.edu/freebsd/head/contrib/wpa/src/utils/os.o
+This programm usses for base64 encoding `base.c` and `os.o` that are under BSD license </br>
+http://web.mit.edu/freebsd/head/contrib/wpa/src/utils/base64.c </br>
+http://web.mit.edu/freebsd/head/contrib/wpa/src/utils/os.o </br>
 
 ## References
-X11Lib Docs                                 https://www.x.org/releases/current/doc/libX11/libX11/libX11.html
-Benchmark results Results for base64:       https://github.com/gaspardpetit/base64/
-better syntax understanding:                https://github.com/QMonkey/Xlib-demo
+X11Lib Docs                                 https://www.x.org/releases/current/doc/libX11/libX11/libX11.html </br>
+Benchmark results Results for base64:       https://github.com/gaspardpetit/base64/ </br>
+better syntax understanding:                https://github.com/QMonkey/Xlib-demo </br>
