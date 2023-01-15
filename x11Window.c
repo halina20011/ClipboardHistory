@@ -85,6 +85,7 @@ const int fontHeight = 18;
 
 const int textOffset = 5;
 
+// This function is useless for now
 Vec2 calculateHeight(int width, const int offsetX, const int offsetY, unsigned int dataLength){
     int height;
 
@@ -122,11 +123,18 @@ int drawContent(Display *display, Window window, int screenN, GC gc){
     dataCount = dataLengthCount;
 
     int heightOffset = fontHeight;
+    
+    // Calculate what is maximum text size that fits in one line
+    unsigned int maxTextLength = (unsigned int)((wWidth - (offsetX * 2)) / fontWidth);
+    // printf("Max text length: %u\n", maxTextLength);
 
     for(int i = dataLengthCount - 1; i >= 0; i--){
+        // Calculate correct index in file, because it is looped from back
         int selectInd = dataLengthCount - 1 - i;
+
         unsigned char *decodedText;
         size_t decodedTextSize;
+
         decodedText = getData(fileName, dataLength, dataLengthCount, i, &decodedTextSize);
         if(decodedText == NULL){
             return 1;
@@ -134,21 +142,36 @@ int drawContent(Display *display, Window window, int screenN, GC gc){
         
         Vec2 size = calculateHeight(wWidth, offsetY, offsetX, decodedTextSize);
         
+        unsigned char *clipboardText;
+        unsigned int clipboardTextSize;
+
+        if(maxTextLength < size.x){
+            clipboardText = malloc(sizeof(char) * (maxTextLength + 1));
+            clipboardTextSize = maxTextLength;
+        }
+        else{
+            clipboardText = malloc(sizeof(char) * (decodedTextSize + 1));
+            clipboardTextSize = decodedTextSize;
+        }
+
+        memcpy(clipboardText, decodedText, clipboardTextSize);
+        clipboardText[clipboardTextSize] = '\0';
+        // printf("Text: >%s<\n", text);
+        
         // printf("X: %i, Y: %i\n", size.x , size.y);
         if(selectInd == selectIndex){
             XSetForeground(display, gc, selectColor[0]);
             XFillRectangle(display, window, gc, 0, heightOffset - size.y, wWidth, size.y * 2);
             XSetForeground(display, gc, selectColor[1]);
-            XDrawString(display, window, gc,    offsetX, heightOffset, decodedText, decodedTextSize);
+            XDrawString(display, window, gc,    offsetX, heightOffset, clipboardText, clipboardTextSize);
         }
         else{
             XSetForeground(display, gc, backgroundColor[1]);
-            XDrawString(display, window, gc,    offsetX, heightOffset, decodedText, decodedTextSize);
+            XDrawString(display, window, gc,    offsetX, heightOffset, clipboardText, clipboardTextSize);
         }
-        XDrawPoint(display, window, gc, offsetX, heightOffset);
-
         heightOffset += size.y * 2;
     
+        free(clipboardText);
         free(decodedText);
     }
 
@@ -170,17 +193,18 @@ int copyText(){
 
     unsigned char *decodedText;
     size_t decodedTextSize;
-    decodedText = getData(fileName, dataLength, dataLengthCount, dataLengthCount - 1 -selectIndex, &decodedTextSize);
+    decodedText = getData(fileName, dataLength, dataLengthCount, dataLengthCount - 1 - selectIndex, &decodedTextSize);
     if(decodedText == NULL){
         return 1;
     }
-
+    
+    // Write text to file that will be copied with xclip
     writeToTmpFile(tmpClipboardText, decodedText);
 
     free(dataLength);
     free(decodedText);
 
-    // Copy
+    // Copy text from file to clipboard with xclip
     char command[50];
     sprintf(command, "cat %s | xclip -i -sel clip", tmpClipboardText);
     // printf("Command: %s\n", command);
