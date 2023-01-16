@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "base64.c"
 
@@ -8,6 +9,18 @@ int printA(int *array, unsigned int size){
         printf("%i, ", array[i]);
     }
     printf("}\n");
+    return 0;
+}
+
+int fileExists(char *fileName){
+    if(access(fileName, F_OK) == -1){
+        FILE *fp;
+        fp = fopen(fileName, "w");
+        if(fp == NULL){
+            printf("[%d] Error when creating new file\n", __LINE__);
+        }
+        fclose(fp);
+    }
     return 0;
 }
 
@@ -67,6 +80,17 @@ int countChar(FILE *fp, const char find){
             count++;
         }
         c = getc(fp);
+    }
+
+    return count;
+}
+
+// Max size of file is 65535
+unsigned int sizeOfFile(FILE *fp){
+    unsigned int count = 0;
+
+    while(getc(fp) != EOF){
+        count++;
     }
 
     return count;
@@ -203,7 +227,7 @@ int writeToFile(char *fileName, char *result, unsigned long size){
     fp = fopen(fileName, "r+");
     if(fp == NULL){
         printf("%s", "Error when opening file\n!");
-        return -1;
+        return 1;
     }
     // unsigned int size = countChar(fp, ':');
     // printf("Number of ':' %i", size);
@@ -227,7 +251,7 @@ int writeToFile(char *fileName, char *result, unsigned long size){
     printf("Base64: %s\n", base64Output);
 
     // Writing to file
-    char *textSize = malloc(6);
+    char *textSize = malloc(sizeof(char) * 6);
     sprintf(textSize, "%06u", out);
     fprintf(fp, "%s:%s\n", textSize, base64Output);
 
@@ -237,5 +261,107 @@ int writeToFile(char *fileName, char *result, unsigned long size){
     fflush(stdout);
 
     fclose(fp);
+    return 0;
+}
+
+// Delete specific line from file
+int deleteLine(char *fileName, int index){
+    FILE *fp;
+    fp = fopen(fileName, "r");
+    if(fp == NULL){
+        return 1;
+    }
+    
+    // Check if lineIndex is out of range
+    int lineCount = countChar(fp, '\n');
+    rewind(fp);
+
+    if(lineCount <= index){
+        printf("Delete index is out of range. Number of lines: %i Index: %i\n", lineCount, index);
+        return 1;
+    }
+
+    printf("Line count in file: %i", lineCount);
+    if(lineCount == 0){
+        return 0;
+    }
+
+    // Get size of file
+    // unsigned int size = sizeOfFile();
+    // printf("%u", size);
+    // rewind(fp);
+    
+    // Get size of file after line deletion
+    unsigned int fileSizeAfterDeletion = 0;
+    unsigned int currentLineOffset = 0;
+    unsigned int fileSplitIndex[2] = {0, 0};
+
+    unsigned int *dataLength;
+    unsigned int dataLengthCount;
+    
+    dataLength = readFile(fileName, &dataLengthCount);
+    if(dataLength == NULL){
+        return 1;
+    }
+    
+    unsigned int *pos = dataLength;
+
+    for(int i = 0; i < dataLengthCount; i++){
+        // de-referencing the pointer
+        unsigned int dataSize = *pos++;
+        //               dataSize + dataLength + '\n'
+        unsigned int lineSize = 7 + dataSize + 1;
+        // printf("Line size: %u\n", dataSize);
+        if(i != index){
+            fileSizeAfterDeletion += lineSize;
+            // printf("Size: %u\n", fileSizeAfterDeletion);
+        }
+        else{
+            fileSplitIndex[0] = currentLineOffset;
+            fileSplitIndex[1] = currentLineOffset + lineSize;
+            // printf("Split [%u][%u]\n", fileSplitIndex[0], fileSplitIndex[1]);
+        }
+        currentLineOffset += lineSize;
+    }
+
+    free(dataLength);
+
+    // Make array of file without line that should be deleted
+    char *editedFileData = malloc(sizeof(char) * (fileSizeAfterDeletion + 1));
+    char *editedFileDataPos = editedFileData;
+    
+    printf("0|---------|%u       %u|---------|%u\n", fileSplitIndex[0], fileSplitIndex[1], currentLineOffset);
+
+    // Add before gap
+    fseek(fp, 0, SEEK_SET);
+    char readChar = fgetc(fp);
+    unsigned int charReadIndex = 0;
+
+    while(readChar != EOF){
+        // printf("Index: %u\n", charReadIndex);
+        if(charReadIndex < fileSplitIndex[0] || fileSplitIndex[1] < charReadIndex){
+            *editedFileDataPos++ = readChar;
+        }
+        readChar = fgetc(fp);
+        charReadIndex += 1;
+    }
+    *editedFileDataPos = '\0';
+
+    // printf("Edited file: >%s<\n", editedFileData);
+    fclose(fp);
+
+    // Write to file
+    fp = fopen(fileName, "w");
+    if(fp == NULL){
+        return 1;
+    }
+    fprintf(fp, "%s", editedFileData);
+
+    fclose(fp);
+
+    free(editedFileData);
+
+    fflush(stdout);
+
     return 0;
 }

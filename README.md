@@ -11,14 +11,19 @@ x11Window.c     ```gcc x11Window.c -L/usr/X11R6/lib -lX11 -o ./Build/x11Window``
 main.c          ```gcc main.c -o ./Build/main -lX11 -lXfixes```</br>
 
 ## Setup 
-make two new files: `clipboardText` and `tmpClipboardText` in /tmp
-```
-touch /tmp/clipboardText
-touch /tmp/tmpClipboardText
-```
+Run `main` for capturing copied text </br>
+```Build/main``` </br>
+Add keybinding to execute x11Window </br>
 
 ## Preview
 ![Preview](/Images/preview.png)
+
+## Control
+`Arrow up`              move through clipboard history one up </br>
+`Arrow down`            move through clipboard history one down </br>
+`Esc` or `q`            exit without anything to be copied </br>
+`Enter`                 copy selected text and exit </br>
+`Del` or `Backspace`    delete selected text from clipboard history </br>
 
 ## How it works
 This are two programs that are responsible for this to work:

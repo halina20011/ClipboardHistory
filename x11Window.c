@@ -25,6 +25,8 @@ const unsigned int keyDown  =   65364;
 const unsigned int enter    =   65293;
 const unsigned int q        =   113;
 const unsigned int esc      =   65307;
+const unsigned int del      =   65535;
+const unsigned int back     =   65288;
 
 typedef struct {
     int x;
@@ -213,9 +215,20 @@ int copyText(){
 }
 
 int main(void){
+    // Create file if it doesn't exist
+    if(fileExists(fileName) != 0){
+        printf("%d File \"%s\"coudn't be created\n", __FILE__, fileName);
+        exit(1);
+    }
+    if(fileExists(tmpClipboardText) != 0){
+        printf("%d File \"%s\"coudn't be created\n", __FILE__, tmpClipboardText);
+        exit(1);
+    }
+
     Display *display;
     Window window;
     XEvent event;
+    XEvent lastEvent;
     XComposeStatus comp;
     KeySym ks;
     
@@ -245,7 +258,7 @@ int main(void){
     screenNum = DefaultScreen(display);
     window = XCreateSimpleWindow(display, RootWindow(display, screenNum), mousePos.x, mousePos.y, wWidth, wHeight, 0, BlackPixel(display, screenNum), backgroundColor[0]);
 
-    XSelectInput(display, window, ExposureMask | KeyPressMask);
+    XSelectInput(display, window, ExposureMask | KeyPressMask | KeyReleaseMask);
     XStoreName(display, window, "Clipboard history");
     XSizeHints *sh = XAllocSizeHints();
     sh->flags = PMinSize | PMaxSize;
@@ -297,10 +310,20 @@ int main(void){
                 copyText();
                 break;
             }
-            if(keyCode == q || keyCode == esc){
+            else if(keyCode == del || keyCode == back && XEventsQueued(display, QueuedAfterReading)){
+                // printf("%i\n", event.xkey.time - lastEvent.xkey.time);
+                // Check if key was released by checking if there was at least 500ms pause between last press and the current one
+                if((event.xkey.time - lastEvent.xkey.time) > 500){
+                    int selIndex = dataCount - 1 - selectIndex;
+                    deleteLine(fileName, selIndex);
+                    drawContent(display, window, screenNum, gc);
+                }
+            }
+            else if(keyCode == q || keyCode == esc){
                 printf("Exiting\n");
                 break;
             }
+            lastEvent = event;
         }
     }
 

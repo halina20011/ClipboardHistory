@@ -72,7 +72,12 @@ void WatchSelection(Display *display, Window window, const char *bufname){
 }
 
 int main(){
-    printf("Starting\n");
+    // Create file if it doesn't exist
+    if(fileExists(fileName) != 0){
+        printf("%d File \"%s\"coudn't be created\n", __FILE__, fileName);
+        exit(1);
+    }
+    printf("Started\n");
     fflush(stdout);
 
     Display *display = XOpenDisplay(NULL);
