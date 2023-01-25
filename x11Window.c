@@ -138,6 +138,8 @@ int drawContent(Display *display, Window window, int screenN, GC gc){
         size_t decodedTextSize;
 
         decodedText = getData(fileName, dataLength, dataLengthCount, i, &decodedTextSize);
+        // printf("%zu\n", decodedTextSize);
+        // printf("Decoded data{%zu}: >%s<\n", decodedTextSize, decodedText);
         if(decodedText == NULL){
             return 1;
         }
@@ -146,8 +148,8 @@ int drawContent(Display *display, Window window, int screenN, GC gc){
         
         unsigned char *clipboardText;
         unsigned int clipboardTextSize;
-
-        if(maxTextLength < size.x){
+        
+        if(maxTextLength < decodedTextSize){
             clipboardText = malloc(sizeof(char) * (maxTextLength + 1));
             clipboardTextSize = maxTextLength;
         }
@@ -158,14 +160,14 @@ int drawContent(Display *display, Window window, int screenN, GC gc){
 
         memcpy(clipboardText, decodedText, clipboardTextSize);
         clipboardText[clipboardTextSize] = '\0';
-        // printf("Text: >%s<\n", text);
         
         // printf("X: %i, Y: %i\n", size.x , size.y);
         if(selectInd == selectIndex){
             XSetForeground(display, gc, selectColor[0]);
             XFillRectangle(display, window, gc, 0, heightOffset - size.y, wWidth, size.y * 2);
             XSetForeground(display, gc, selectColor[1]);
-            XDrawString(display, window, gc,    offsetX, heightOffset, clipboardText, clipboardTextSize);
+            XDrawString(display, window, gc,    offsetX, heightOffset,  clipboardText, clipboardTextSize);
+            // printf("Text printed on screen{%u}: >%s<\n", clipboardTextSize, clipboardText);
         }
         else{
             XSetForeground(display, gc, backgroundColor[1]);

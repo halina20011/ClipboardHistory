@@ -1,19 +1,13 @@
 # Clipboard History
-This is my first "Vanilla" C program so there will be a lot of things to improve.
-
-## In development
-I am currently still working on it. 
-This is more archive commit for when it still works. 
-It has some bugs on witch I am working towards removing them.
+Simple c program with which you can access text before that was copied before
 
 ## Building
-x11Window.c     ```gcc x11Window.c -L/usr/X11R6/lib -lX11 -o ./Build/x11Window```</br>
-main.c          ```gcc main.c -o ./Build/main -lX11 -lXfixes```</br>
+x11Window.c &emsp ;```gcc x11Window.c -L/usr/X11R6/lib -lX11 -o ./Build/x11Window```</br>
+main.c &emsp ;```gcc main.c -o ./Build/main -lX11 -lXfixes```</br>
 
 ## Setup 
-Run `main` for capturing copied text </br>
-```Build/main``` </br>
-Add keybinding to execute x11Window </br>
+Run `main` for capturing copied text: ```./Build/main``` </br>
+Add keybinding in your :tiling window manager" or "desktop environment" for execute x11Window </br>
 
 ## Preview
 ![Preview](/Images/preview.png)
@@ -40,8 +34,7 @@ x11Window.c     program that uses x11lib for creating window with witch you can 
 xclip
 
 ## Todo
-Fix a lot of bugs </br>
-remove the need of `os.h` </br>
+removing new line if its in the end </br>
 remove the need of `xclip` </br>
 demonize `main.c` </br>
 add text wrap </br>

@@ -11,8 +11,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "os.h"
-
 static const unsigned char base64_table[65] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -91,15 +89,15 @@ unsigned char * base64Decode(const unsigned char *src, size_t len, size_t *outLe
 	size_t i, count, olen;
 	int pad = 0;
 
-	os_memset(dtable, 0x80, 256);
-	for (i = 0; i < sizeof(base64_table) - 1; i++){
+    memset(dtable, 0x80, sizeof(char) * 256);
+	for(i = 0; i < sizeof(base64_table) - 1; i++){
 		dtable[base64_table[i]] = (unsigned char) i;
     }
 	dtable['='] = 0;
 
 	count = 0;
 	for(i = 0; i < len; i++){
-		if (dtable[src[i]] != 0x80){
+		if(dtable[src[i]] != 0x80){
 			count++;
         }
 	}
@@ -109,7 +107,7 @@ unsigned char * base64Decode(const unsigned char *src, size_t len, size_t *outLe
     }
 
 	olen = count / 4 * 3;
-	pos = out = malloc(olen);
+	pos = out = malloc(sizeof(char) * (olen + 1));
 	if(out == NULL){
 		return NULL;
     }
@@ -121,7 +119,7 @@ unsigned char * base64Decode(const unsigned char *src, size_t len, size_t *outLe
 			continue;
         }
 
-		if (src[i] == '='){
+		if(src[i] == '='){
 			pad++;
         }
 
@@ -139,7 +137,7 @@ unsigned char * base64Decode(const unsigned char *src, size_t len, size_t *outLe
 				else if (pad == 2){
 					pos -= 2;
                 }
-				else {
+				else{
 					/* Invalid padding */
 					free(out);
 					return NULL;
@@ -149,6 +147,7 @@ unsigned char * base64Decode(const unsigned char *src, size_t len, size_t *outLe
 		}
 	}
 
+	*pos = '\0';
 	*outLen = pos - out;
 	return out;
 }

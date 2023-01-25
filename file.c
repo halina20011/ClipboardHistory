@@ -121,27 +121,27 @@ unsigned char *getData(char *fileName, unsigned int *dataLength, unsigned int da
     // de-referencing the pointer
     unsigned int dataSize = *pos;
     // printf("Encoded data size: %u\n", dataSize);
-    dataSize++;
-
-    char *data = (char*)malloc(sizeof(char) * dataSize);
+    char *data = (char*)malloc(sizeof(char) * (dataSize + 1));
     
     fseek(fp, fileIndex, SEEK_SET);
-    char *rCode = fgets(data, dataSize, fp);
+    char *rCode = fgets(data, dataSize + 1, fp);
+
     if(rCode == NULL){
         printf("Error occurrend when reading encoded data.\n");
         fclose(fp);
         return NULL;
     }
+
     fflush(stdout);
     fclose(fp);
 
     unsigned char *decodedData;
-    size_t decodedDataSize;
+    size_t decodedDataSize = 0;
     decodedData = base64Decode(data, dataSize, &decodedDataSize);
-
-    // printf("Encoded data: %s\n", data);
-    // printf("Decoded data: %s\n", decodedData);
     
+    // printf("Encoded data: %s\n", data);
+    printf("Decoded data{%zu}: %s\n", decodedDataSize, decodedData);
+
     *decodedTextSize = decodedDataSize;
     return decodedData;
 }
@@ -339,7 +339,7 @@ int deleteLine(char *fileName, int index){
 
     while(readChar != EOF){
         // printf("Index: %u\n", charReadIndex);
-        if(charReadIndex < fileSplitIndex[0] || fileSplitIndex[1] < charReadIndex){
+        if(charReadIndex < fileSplitIndex[0] || fileSplitIndex[1] <= charReadIndex){
             *editedFileDataPos++ = readChar;
         }
         readChar = fgetc(fp);
