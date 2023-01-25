@@ -37,7 +37,49 @@ Bool PrintSelection(Display *display, Window window, const char *bufname, const 
             printf("Buffer is too large and INCR reading is not implemented yet.\n");
         }
         else{
-            writeToFile(fileName, result, ressize);
+            char *dataToCopy;
+            unsigned int dataToCopySize = ressize;
+
+            // Delete all spaces before first letter
+            if(result[0] == ' '){
+                char *pos = result;
+                int numberOfSpaces = 0;
+                for(int i = 0; i < ressize; i++){
+                    if(*pos++ == ' '){
+                        numberOfSpaces += 1;
+                        // printf("On index %i is space\n", i);
+                    }
+                    else{
+                        break;
+                    }
+                }
+
+                dataToCopySize = ressize - numberOfSpaces;
+                dataToCopy = malloc(sizeof(char) * dataToCopySize);
+                memcpy(dataToCopy, result + numberOfSpaces, dataToCopySize);
+                // printf("Data without spaces: >%s<\n", dataToCopy);
+            }
+            else{
+                dataToCopy = result;
+            }
+
+            // if last char is new line then delete it
+            if(dataToCopy[dataToCopySize - 1] == '\n'){
+                unsigned resultWithoutNewLineSize = (dataToCopySize - 1);
+                char *resultWithoutNewLine = malloc(sizeof(char) * (resultWithoutNewLineSize + 1)); 
+
+                memcpy(resultWithoutNewLine, dataToCopy, resultWithoutNewLineSize);
+                resultWithoutNewLine[resultWithoutNewLineSize] = '\0';
+
+                // printf("Data without new line: >%s<\n", resultWithoutNewLine);
+                writeToFile(fileName, resultWithoutNewLine, dataToCopySize - 1);
+
+                free(resultWithoutNewLine);
+            }
+            else{
+                writeToFile(fileName, dataToCopy, dataToCopySize);
+            }
+            free(dataToCopy);
             // printf("%.*s\n", (int)ressize, result);
         }
 

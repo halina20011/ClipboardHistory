@@ -140,7 +140,7 @@ unsigned char *getData(char *fileName, unsigned int *dataLength, unsigned int da
     decodedData = base64Decode(data, dataSize, &decodedDataSize);
     
     // printf("Encoded data: %s\n", data);
-    printf("Decoded data{%zu}: %s\n", decodedDataSize, decodedData);
+    // printf("Decoded data{%zu}: %s\n", decodedDataSize, decodedData);
 
     *decodedTextSize = decodedDataSize;
     return decodedData;
@@ -223,6 +223,10 @@ unsigned int *readFile(char *fileName, unsigned int *dataLengthCount){
 }
 
 int writeToFile(char *fileName, char *result, unsigned long size){
+    if(size == 0){
+        return 0;
+    }
+
     FILE *fp;
     fp = fopen(fileName, "r+");
     if(fp == NULL){

@@ -17,6 +17,9 @@ unsigned int windowCound = 10;
 char *fileName = "/tmp/clipboardText";
 char *tmpClipboardText = "/tmp/tmpClipboardText";
 
+// Minimum time[ms] that is between press of del key
+const unsigned int charPressSleep = 200;
+
 unsigned int selectIndex = 0;
 unsigned int dataCount = 0;
 
@@ -314,8 +317,8 @@ int main(void){
             }
             else if(keyCode == del || keyCode == back && XEventsQueued(display, QueuedAfterReading)){
                 // printf("%i\n", event.xkey.time - lastEvent.xkey.time);
-                // Check if key was released by checking if there was at least 500ms pause between last press and the current one
-                if((event.xkey.time - lastEvent.xkey.time) > 500){
+                // Check if key was released by checking if there was at least [charPressSleep] pause between last press and the current one
+                if((event.xkey.time - lastEvent.xkey.time) > charPressSleep){
                     int selIndex = dataCount - 1 - selectIndex;
                     deleteLine(fileName, selIndex);
                     drawContent(display, window, screenNum, gc);
