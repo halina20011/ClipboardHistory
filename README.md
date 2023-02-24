@@ -2,12 +2,12 @@
 Simple c program with which you can access text before that was copied before
 
 ## Building
-x11Window.c &emsp ;```gcc x11Window.c -L/usr/X11R6/lib -lX11 -o ./Build/x11Window```</br>
-main.c &emsp ;```gcc main.c -o ./Build/main -lX11 -lXfixes```</br>
+x11Window.c &emsp; ```gcc x11Window.c -L/usr/X11R6/lib -lX11 -o ./Build/x11Window```</br>
+main.c &emsp;&emsp; ```gcc main.c -o ./Build/main -lX11 -lXfixes```</br>
 
 ## Setup 
 Run `main` for capturing copied text: ```./Build/main``` </br>
-Add keybinding in your :tiling window manager" or "desktop environment" for execute x11Window </br>
+Add keybinding in your "tiling window manager" or "desktop environment" for execute x11Window </br>
 
 ## Preview
 ![Preview](/Images/preview.png)
@@ -34,16 +34,14 @@ x11Window.c     program that uses x11lib for creating window with witch you can 
 xclip
 
 ## Todo
-removing new line if its in the end </br>
+text to be in UTF-8 </br>
+add image support </br>
 remove the need of `xclip` </br>
 demonize `main.c` </br>
-add text wrap </br>
-add image support </br>
 
 ## Acknowledgment
-This programm usses for base64 encoding `base.c` and `os.o` that are under BSD license </br>
+This programm usses for base64 encoding `base.c` that is under BSD license </br>
 http://web.mit.edu/freebsd/head/contrib/wpa/src/utils/base64.c </br>
-http://web.mit.edu/freebsd/head/contrib/wpa/src/utils/os.o </br>
 
 ## References
 X11Lib Docs                                 https://www.x.org/releases/current/doc/libX11/libX11/libX11.html </br>

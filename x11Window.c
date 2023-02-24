@@ -133,16 +133,22 @@ int drawContent(Display *display, Window window, int screenN, GC gc){
     
     // Calculate what is maximum text size that fits in to one line
     unsigned int maxTextLength = (unsigned int)((wWidth - (offsetX * 2)) / fontWidth);
-    printf("Max text length: %u\n", maxTextLength);
+    unsigned int windowFitHeight = wHeight / (fontHeight * 2);
+    // printf("Fit in w: %u\n", windowFitHeight);
+    // printf("Max text length: %u\n", maxTextLength);
 
-    for(int i = dataLengthCount - 1; i >= 0; i--){
+    unsigned int index = selectIndex % windowFitHeight;
+    unsigned int indexFrom = ((int)selectIndex / windowFitHeight) * windowFitHeight;
+    printf("Index from: %u Index: %u\n", indexFrom, index);
+
+    for(int i = indexFrom; i < dataLengthCount; i++){
         // Calculate correct index in file, because it is looped from back
-        int selectInd = dataLengthCount - 1 - i;
+        int fileIndex = dataLengthCount - 1 - i;
 
         unsigned char *decodedText;
         size_t decodedTextSize;
 
-        decodedText = getData(fileName, dataLength, dataLengthCount, i, &decodedTextSize);
+        decodedText = getData(fileName, dataLength, dataLengthCount, fileIndex, &decodedTextSize);
         // printf("%zu\n", decodedTextSize);
         // printf("Decoded data{%zu}: >%s<\n", decodedTextSize, decodedText);
         if(decodedText == NULL){
@@ -168,7 +174,7 @@ int drawContent(Display *display, Window window, int screenN, GC gc){
         clipboardText[clipboardTextSize] = '\0';
         
         // printf("X: %i, Y: %i\n", size.x , size.y);
-        if(selectInd == selectIndex){
+        if(i == selectIndex){
             XSetForeground(display, gc, selectColor[0]);
             XFillRectangle(display, window, gc, 0, heightOffset - size.y, wWidth, size.y * 2);
             XSetForeground(display, gc, selectColor[1]);

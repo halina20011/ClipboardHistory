@@ -173,7 +173,7 @@ unsigned int *readFile(char *fileName, unsigned int *dataLengthCount){
         exit(1);
     }
     
-    printf("Allocating memory for \"dataLength\"\n");
+    // printf("Allocating memory for \"dataLength\"\n");
     dataLength = malloc(sizeof(unsigned int) * size);
     if(dataLength == NULL){
         printf("Error acured when allocating memory on line: &d\n", __FILE__);
@@ -185,11 +185,11 @@ unsigned int *readFile(char *fileName, unsigned int *dataLengthCount){
     char buf[8];
     char num[7];
     size_t bufSize = sizeof(buf);
-    printf("Buf size: %zu\n", bufSize);
+    // printf("Buf size: %zu\n", bufSize);
 
     while(fgets(buf, bufSize, fp) != NULL){
         // printf("Buf: %s\n", buf);
-        printf("Buf on 6 is >%c<\n", buf[6]);
+        // printf("Buf on 6 is >%c<\n", buf[6]);
         if(buf[6] == ':'){
             memcpy(num, buf, 6);
             printf("Num: %s\n", num);
