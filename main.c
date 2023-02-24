@@ -37,11 +37,14 @@ Bool PrintSelection(Display *display, Window window, const char *bufname, const 
             printf("Buffer is too large and INCR reading is not implemented yet.\n");
         }
         else{
-            char *dataToCopy;
+            char *dataToCopy = malloc(sizeof(char) * (ressize + 1));
+            memcpy(dataToCopy, result, ressize);
+            dataToCopy[ressize] = '\0';
             unsigned int dataToCopySize = ressize;
 
             // Delete all spaces before first letter
             if(result[0] == ' '){
+                printf("Removing spaces before\n");
                 char *pos = result;
                 int numberOfSpaces = 0;
                 for(int i = 0; i < ressize; i++){
@@ -55,30 +58,22 @@ Bool PrintSelection(Display *display, Window window, const char *bufname, const 
                 }
 
                 dataToCopySize = ressize - numberOfSpaces;
-                dataToCopy = malloc(sizeof(char) * dataToCopySize);
+                dataToCopy = (char *)realloc(dataToCopy, sizeof(char) * (dataToCopySize + 1));
                 memcpy(dataToCopy, result + numberOfSpaces, dataToCopySize);
+                dataToCopy[dataToCopySize] = '\0';
                 // printf("Data without spaces: >%s<\n", dataToCopy);
             }
-            else{
-                dataToCopy = result;
-            }
 
-            // if last char is new line then delete it
+            // If last char is new line then delete it
             if(dataToCopy[dataToCopySize - 1] == '\n'){
-                unsigned resultWithoutNewLineSize = (dataToCopySize - 1);
-                char *resultWithoutNewLine = malloc(sizeof(char) * (resultWithoutNewLineSize + 1)); 
+                printf("Removing new line\n");
+                dataToCopySize = (dataToCopySize - 1);
+                dataToCopy = (char *)realloc(dataToCopy, sizeof(char) * (dataToCopySize + 1)); 
 
-                memcpy(resultWithoutNewLine, dataToCopy, resultWithoutNewLineSize);
-                resultWithoutNewLine[resultWithoutNewLineSize] = '\0';
-
-                // printf("Data without new line: >%s<\n", resultWithoutNewLine);
-                writeToFile(fileName, resultWithoutNewLine, dataToCopySize - 1);
-
-                free(resultWithoutNewLine);
+                dataToCopy[dataToCopySize] = '\0';
             }
-            else{
-                writeToFile(fileName, dataToCopy, dataToCopySize);
-            }
+
+            writeToFile(fileName, dataToCopy, dataToCopySize);
             free(dataToCopy);
             // printf("%.*s\n", (int)ressize, result);
         }

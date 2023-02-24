@@ -116,10 +116,12 @@ const int offsetY = 5;
 int drawContent(Display *display, Window window, int screenN, GC gc){
     XClearWindow(display, window);
     unsigned int *dataLength;
-    unsigned int dataLengthCount;
+    unsigned int dataLengthCount = 0;
     
+    printf("Reading file\n");
     dataLength = readFile(fileName, &dataLengthCount);
     if(dataLength == NULL){
+        printf("Error when reading file size on line: %d\n", __FILE__);
         return 1;
     }
 
@@ -129,9 +131,9 @@ int drawContent(Display *display, Window window, int screenN, GC gc){
 
     int heightOffset = fontHeight;
     
-    // Calculate what is maximum text size that fits in one line
+    // Calculate what is maximum text size that fits in to one line
     unsigned int maxTextLength = (unsigned int)((wWidth - (offsetX * 2)) / fontWidth);
-    // printf("Max text length: %u\n", maxTextLength);
+    printf("Max text length: %u\n", maxTextLength);
 
     for(int i = dataLengthCount - 1; i >= 0; i--){
         // Calculate correct index in file, because it is looped from back
@@ -144,6 +146,7 @@ int drawContent(Display *display, Window window, int screenN, GC gc){
         // printf("%zu\n", decodedTextSize);
         // printf("Decoded data{%zu}: >%s<\n", decodedTextSize, decodedText);
         if(decodedText == NULL){
+            printf("Error when decoding text from file on line: %d\n", __FILE__);
             return 1;
         }
         
@@ -257,6 +260,7 @@ int main(void){
     Vec2 mousePos = {-1, -1};
     mousePos = getMousePosition(display);
     if(mousePos.x < 0 || mousePos.y < 0){
+        printf("Negative mouse position exited on line: %d\n", __FILE__);
         exit(1);
     }
 
@@ -274,11 +278,15 @@ int main(void){
     
     gc = DefaultGC(display, screenNum);
 
+    printf("Window was created\n");
+
     while(1){
         XNextEvent(display, &event);
         //printf((char)event.type);
         if(event.type == Expose){
+            printf("Drawing content\n");
             drawContent(display, window, screenNum, gc);
+            printf("Content was drawn\n");
         }
         if(event.type == KeyPress){
             // printf("Key was pressed\n");

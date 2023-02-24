@@ -162,8 +162,7 @@ unsigned int *readFile(char *fileName, unsigned int *dataLengthCount){
     rewind(fp);
     int colonC = countChar(fp, ':');
     rewind(fp);
-    // printf("New lines:  %i\n", newLineC);
-    // printf("Colons:     %i\n", colonC);
+    printf("Number of \"new lines\": %i \"colons\": %i\n", newLineC, colonC);
 
     unsigned int size = 0;
     if(newLineC == colonC){
@@ -174,21 +173,30 @@ unsigned int *readFile(char *fileName, unsigned int *dataLengthCount){
         exit(1);
     }
     
+    printf("Allocating memory for \"dataLength\"\n");
     dataLength = malloc(sizeof(unsigned int) * size);
+    if(dataLength == NULL){
+        printf("Error acured when allocating memory on line: &d\n", __FILE__);
+        return NULL;
+    }
     unsigned int *pos = dataLength;
 
     // Size + '\0'
     char buf[8];
     char num[7];
+    size_t bufSize = sizeof(buf);
+    printf("Buf size: %zu\n", bufSize);
 
-    while(fgets(buf, sizeof(buf), fp) != NULL){
+    while(fgets(buf, bufSize, fp) != NULL){
         // printf("Buf: %s\n", buf);
+        printf("Buf on 6 is >%c<\n", buf[6]);
         if(buf[6] == ':'){
             memcpy(num, buf, 6);
-            // printf("Num: %s\n", num);
+            printf("Num: %s\n", num);
 
             if(num == NULL){
-                printf("AAAAA num is NULL!");
+                printf("Num is NULL on line: %d\n", __FILE__);
+                return NULL;
             }
 
             char *numberChar;
@@ -204,6 +212,9 @@ unsigned int *readFile(char *fileName, unsigned int *dataLengthCount){
             fflush(stdout);
             *pos++ = number;
         }
+
+        // Clear buffer of memory for next use
+        memset(buf, ' ', bufSize);
     }
     *dataLengthCount = pos - dataLength;
 
@@ -247,7 +258,7 @@ int writeToFile(char *fileName, char *result, unsigned long size){
     unsigned char *base64Output;
     base64Output = base64Encode(result, size, &out);
     if(base64Output == NULL){
-        printf("Error");
+        printf("Error when encoding memory to base64 on line: %d", __LINE__);
         return 1;
     }
 
@@ -256,8 +267,14 @@ int writeToFile(char *fileName, char *result, unsigned long size){
 
     // Writing to file
     char *textSize = malloc(sizeof(char) * 6);
+    if(textSize == NULL){
+        printf("Error when allocating memory on line: %d", __LINE__);
+        return 1;
+    }
+
     sprintf(textSize, "%06u", out);
     fprintf(fp, "%s:%s\n", textSize, base64Output);
+    printf("Written to file\n");
 
     free(textSize);
     free(base64Output);
