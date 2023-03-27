@@ -159,16 +159,15 @@ int drawContent(Display *display, Window window, int screenN, GC gc){
         Vec2 size = calculateHeight(wWidth, offsetY, offsetX, decodedTextSize);
         
         unsigned char *clipboardText;
-        unsigned int clipboardTextSize;
-        
-        if(maxTextLength < decodedTextSize){
-            clipboardText = malloc(sizeof(char) * (maxTextLength + 1));
-            clipboardTextSize = maxTextLength;
-        }
-        else{
-            clipboardText = malloc(sizeof(char) * (decodedTextSize + 1));
-            clipboardTextSize = decodedTextSize;
-        }
+        unsigned int clipboardTextSize = (maxTextLength < decodedTextSize) ? maxTextLength : decodedTextSize;
+        clipboardText = malloc(sizeof(char) * (clipboardTextSize + 1));
+        // if(maxTextLength < decodedTextSize){
+        //     clipboardTextSize = maxTextLength;
+        // }
+        // else{
+        //     clipboardText = malloc(sizeof(char) * (decodedTextSize + 1));
+        //     clipboardTextSize = decodedTextSize;
+        // }
 
         memcpy(clipboardText, decodedText, clipboardTextSize);
         clipboardText[clipboardTextSize] = '\0';
@@ -207,10 +206,10 @@ int copyText(){
         return 1;
     }
 
-    unsigned char *decodedText;
     size_t decodedTextSize;
-    decodedText = getData(fileName, dataLength, dataLengthCount, dataLengthCount - 1 - selectIndex, &decodedTextSize);
+    unsigned char *decodedText = getData(fileName, dataLength, dataLengthCount, dataLengthCount - 1 - selectIndex, &decodedTextSize);
     if(decodedText == NULL){
+        free(dataLength);
         return 1;
     }
     
@@ -225,6 +224,7 @@ int copyText(){
     sprintf(command, "cat %s | xclip -i -sel clip", tmpClipboardText);
     // printf("Command: %s\n", command);
     system(command);
+
     return 0;
 }
 
@@ -234,6 +234,7 @@ int main(void){
         printf("%d File \"%s\"coudn't be created\n", __FILE__, fileName);
         exit(1);
     }
+
     if(fileExists(tmpClipboardText) != 0){
         printf("%d File \"%s\"coudn't be created\n", __FILE__, tmpClipboardText);
         exit(1);

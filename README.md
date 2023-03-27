@@ -34,6 +34,7 @@ x11Window.c     program that uses x11lib for creating window with witch you can 
 xclip
 
 ## Todo
+add list of programs from witch main.c should ignore copy </br>
 text to be in UTF-8 </br>
 add image support </br>
 remove the need of `xclip` </br>

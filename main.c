@@ -13,7 +13,9 @@
 
 char *fileName = "/tmp/clipboardText";
 
-Bool PrintSelection(Display *display, Window window, const char *bufname, const char *fmtname){
+#define EVER ;;
+
+Bool printSelection(Display *display, Window window, const char *bufname, const char *fmtname){
     unsigned char *result;
     unsigned long ressize, restail;
     int resbits;
@@ -87,20 +89,20 @@ Bool PrintSelection(Display *display, Window window, const char *bufname, const 
 }
 
 // https://stackoverflow.com/a/44992967/14621024
-void WatchSelection(Display *display, Window window, const char *bufname){
+void watchSelection(Display *display, Window window, const char *bufname){
     int event_base, error_base;
     XEvent event;
     Atom bufid = XInternAtom(display, bufname, False);
 
-    assert( XFixesQueryExtension(display, &event_base, &error_base) );
+    assert(XFixesQueryExtension(display, &event_base, &error_base));
     XFixesSelectSelectionInput(display, DefaultRootWindow(display), bufid, XFixesSetSelectionOwnerNotifyMask);
-
-    while (True){
+    
+    for(EVER){
         XNextEvent(display, &event);
 
         if(event.type == event_base + XFixesSelectionNotify && ((XFixesSelectionNotifyEvent*)&event)->selection == bufid){
-            if(!PrintSelection(display, window, bufname, "UTF8_STRING")){
-                PrintSelection(display, window, bufname, "STRING");
+            if(!printSelection(display, window, bufname, "UTF8_STRING")){
+                printSelection(display, window, bufname, "STRING");
             }
 
             fflush(stdout);
@@ -120,10 +122,8 @@ int main(){
     Display *display = XOpenDisplay(NULL);
     unsigned long color = BlackPixel(display, DefaultScreen(display));
     Window window = XCreateSimpleWindow(display, DefaultRootWindow(display), 0,0, 1,1, 0, color, color);
-    // Bool result = PrintSelection(display, window, "CLIPBOARD", "UTF8_STRING") ||
-    // PrintSelection(display, window, "CLIPBOARD", "STRING");
 
-    WatchSelection(display, window, "CLIPBOARD");
+    watchSelection(display, window, "CLIPBOARD");
     XDestroyWindow(display, window);
     XCloseDisplay(display);
     return 0;

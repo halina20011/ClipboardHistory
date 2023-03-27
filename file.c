@@ -3,12 +3,15 @@
 
 #include "base64.c"
 
-int printA(int *array, unsigned int size){
+int printArray(int *array, unsigned int size){
     printf("Array[%u]{", size);
+
     for(int i = 0; i < size; i++){
         printf("%i, ", array[i]);
     }
+
     printf("}\n");
+
     return 0;
 }
 
@@ -16,11 +19,14 @@ int fileExists(char *fileName){
     if(access(fileName, F_OK) == -1){
         FILE *fp;
         fp = fopen(fileName, "w");
+
         if(fp == NULL){
             printf("[%d] Error when creating new file\n", __LINE__);
         }
+
         fclose(fp);
     }
+
     return 0;
 }
 
@@ -30,8 +36,10 @@ int writeToTmpFile(char *fileName, const char *text){
     if(fp == NULL){
         return 1;
     }
+
     fprintf(fp, "%s", text);
     fclose(fp);
+
     return 0;
 }
 
@@ -47,21 +55,20 @@ char *removeLeadingZeros(char *buf, unsigned int bufSize, unsigned int *numberSi
     unsigned int length = bufSize - numStart;
 
     char *returnChar;
-    length++;           // Add null termination
-    returnChar = malloc(sizeof(char) * length);
+    returnChar = malloc(sizeof(char) * (length + 1));
 
     if(returnChar == NULL){
         return NULL;
     }
 
-    char *pos;
-    pos = returnChar;
+    char *pos = returnChar;
 
     for(int i = numStart; i < bufSize; i++){
         *pos++ = buf[i];
     }
-    *pos = '\0';
+
     *numberSize = pos - returnChar;
+    *pos = '\0';
 
     // printf("%zu\n", sizeof(returnChar));
     // printf("Return char: %s\n", returnChar);
@@ -89,9 +96,15 @@ int countChar(FILE *fp, const char find){
 unsigned int sizeOfFile(FILE *fp){
     unsigned int count = 0;
 
-    while(getc(fp) != EOF){
-        count++;
-    }
+    // while(getc(fp) != EOF){
+    //     count++;
+    // }
+
+    fseek(fp, 0L, SEEK_END);
+    count = ftell(fp);
+
+    // rewind(fp);
+    fseek(fp, 0L, SEEK_SET);
 
     return count;
 }
@@ -220,7 +233,7 @@ unsigned int *readFile(char *fileName, unsigned int *dataLengthCount){
 
     // de-referencing the pointer
     unsigned int tmpLength = *dataLengthCount;
-    printA(dataLength, tmpLength);
+    printArray(dataLength, tmpLength);
 
     // if(dataLengthCount != lineCount){
     //     printf("Error when parsing file on line: %d\n", __LINE__);
@@ -248,10 +261,6 @@ int writeToFile(char *fileName, char *result, unsigned long size){
     // printf("Number of ':' %i", size);
     int n = countChar(fp, '\n');
     printf("Line count: %d\n", n);
-    // TODO: if there are more then 10 lines remove them
-    // if(10 < n){
-    // 
-    // }
     
     // Convert data to base64
     size_t out;
@@ -310,7 +319,6 @@ int deleteLine(char *fileName, int index){
     // Get size of file
     // unsigned int size = sizeOfFile();
     // printf("%u", size);
-    // rewind(fp);
     
     // Get size of file after line deletion
     unsigned int fileSizeAfterDeletion = 0;
